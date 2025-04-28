@@ -16,6 +16,10 @@ func main() {
 
 	srv := server.NewServer(logger)
 
+	addr := srv.Server.Addr
+
+	logger.Printf("Server is starting on %s\n", addr)
+
 	if err := srv.Server.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}

@@ -17,34 +17,10 @@ func BaseHandle(h http.ResponseWriter, r *http.Request) {
 		http.Error(h, "method not supporting", http.StatusInternalServerError)
 		return
 	}
-
-	if r.URL.Path != "/" {
-		http.NotFound(h, r)
-		return
-	}
-
-	file, err := os.Open("index.html")
-	if err != nil {
-		http.Error(h, "file not found", http.StatusInternalServerError)
-		return
-	}
-	defer file.Close()
-
-	h.Header().Set("Content-Type", "text/html")
-
-	http.ServeContent(h, r, "index.html", time.Time{}, file)
-
-	//	if err := recover(); err != nil {
-	//	http.Error(h, "internal server error", http.StatusInternalServerError)
-	//}
+	http.ServeFile(h, r, "index.html")
 }
 
 func UploadHandle(h http.ResponseWriter, r *http.Request) {
-
-	if r.URL.Path != "/upload" {
-		http.NotFound(h, r)
-		return
-	}
 
 	if r.Method != http.MethodPost {
 		http.Error(h, "method not supported", http.StatusInternalServerError)
@@ -104,6 +80,9 @@ func UploadHandle(h http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.Write([]byte(convertedString))
-
+	if _, err := h.Write([]byte(convertedString)); err != nil {
+		http.Error(h, "error writing response", http.StatusInternalServerError)
+		return
+	}
+	h.WriteHeader(http.StatusOK)
 }
